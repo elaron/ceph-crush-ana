@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "backend": "native",
+            "program": "${fileDirname}",
+            "env": {},
+            "args": [ "-osdNum=320", "-layers=node,straw,4"],
+            "showLog": true
+        }
+    ]
+}
