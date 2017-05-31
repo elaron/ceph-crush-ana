@@ -1,9 +1,18 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"strconv"
+	"strings"
 )
+
+type Layer struct {
+	name       string
+	bucketType string
+	size       uint32
+}
 
 func main() {
 	osdNum := flag.Int("osdNum", 0, "OSD number")
@@ -11,10 +20,36 @@ func main() {
 
 	flag.Parse()
 	osdNumber := *osdNum
-	layers := *layerSetting
 
 	fmt.Println("hello world")
-	fmt.Println("PARAS: ", osdNumber, layers)
+	fmt.Println("PARAS: ", osdNumber, *layerSetting)
+	layers, err := initLayerSettings(*layerSetting)
+	if nil != err {
+		fmt.Sprintln(err.Error())
+		return
+	}
+	fmt.Println(layers)
+}
+
+func initLayerSettings(settings string) (layers []Layer, err error) {
+	layerParas := strings.Split(settings, ",")
+	if len(layerParas)%3 != 0 {
+		s := "Illegal layer settings"
+		err = errors.New(s)
+		return
+	}
+
+	for index := 0; index < len(layerParas); index += 3 {
+		lsize, _ := strconv.Atoi(layerParas[index+2])
+		l := Layer{
+			name:       layerParas[index],
+			bucketType: layerParas[index+1],
+			size:       uint32(lsize),
+		}
+		layers = append(layers, l)
+	}
+	err = nil
+	return
 }
 
 //CrushBucket represent crush bucket's basic information
