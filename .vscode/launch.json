@@ -10,7 +10,7 @@
             "backend": "native",
             "program": "${fileDirname}",
             "env": {},
-            "args": [ "-osdNum=24", "-layers=node,straw2,4,rack,straw2,3,root,straw2,2"],
+            "args": [ "-osdNum=23", "-layers=node,straw2,4,rack,straw2,3,root,straw2,2"],
             "showLog": true
         }
     ]

@@ -19,16 +19,19 @@ func main() {
 	layerSetting := flag.String("layers", "", "Layer settings")
 
 	flag.Parse()
-	osdNumber := *osdNum
+	osdNumber := uint32(*osdNum)
+	fmt.Println("osdNum=", osdNumber)
 
-	fmt.Println("hello world")
-	fmt.Println("PARAS: ", osdNumber, *layerSetting)
 	layers, err := initLayerSettings(*layerSetting)
 	if nil != err {
 		fmt.Sprintln(err.Error())
 		return
 	}
 	fmt.Println(layers)
+
+	createBuckets(osdNumber, layers)
+	fmt.Println("Bucket: ", gCrushMap.buckets)
+
 }
 
 func initLayerSettings(settings string) (layers []Layer, err error) {
@@ -52,15 +55,82 @@ func initLayerSettings(settings string) (layers []Layer, err error) {
 	return
 }
 
+func createBuckets(osdNum uint32, layers []Layer) {
+
+	//init device id and weight
+	var lowerItems, lowerWeights []int32
+	var i int32
+	count := int32(osdNum)
+	for i = 0; i < count; i++ {
+		lowerItems = append(lowerItems, i)
+		lowerWeights = append(lowerWeights, 1)
+	}
+
+	//create buckets
+	for _, layer := range layers {
+		var newItems, newWeights []int32
+		var pos uint32
+		length := uint32(len(lowerItems))
+		for {
+			if pos == length {
+				break
+			}
+			var weight int32
+			var items, weights []int32
+			for i := 0; i < int(layer.size); i++ {
+				if pos == osdNum {
+					break
+				}
+				items = append(items, lowerItems[pos])
+				weights = append(weights, lowerWeights[pos])
+				weight += lowerWeights[pos]
+				pos++
+			}
+			bucketID := addBucket(layer.bucketType, weight, items, weights)
+
+			newItems = append(newItems, bucketID)
+			newWeights = append(newWeights, weight)
+		}
+
+		lowerItems = newItems
+		lowerWeights = newWeights
+	}
+	return
+}
+
+func addBucket(btype string, weight int32, items []int32, weights []int32) (bucketID int32) {
+
+	var bucket CrushBucket
+
+	bucketID = int32(-1 * (len(gCrushMap.buckets) + 1))
+
+	bucket.size = uint32(len(items))
+	bucket.bktType = btype
+	bucket.weight = weight
+	bucket.items = items
+	bucket.itemWeights = weights
+	bucket.id = bucketID
+
+	gCrushMap.buckets = append(gCrushMap.buckets, bucket)
+	return
+}
+
+type CrushMap struct {
+	buckets []CrushBucket
+}
+
+var gCrushMap CrushMap
+
 //CrushBucket represent crush bucket's basic information
 type CrushBucket struct {
-	id      int32
-	bktType uint16 //type=0 is reserved for devieces
-	alg     uint8
-	hash    uint8
-	weight  uint32 //16-bit fixed point
-	size    uint32
-	items   []int32
+	id          int32
+	bktType     string //type=0 is reserved for devieces
+	alg         uint8
+	hash        uint8
+	weight      int32 //16-bit fixed point
+	size        uint32
+	items       []int32
+	itemWeights []int32
 }
 
 //CrushBucketStraw2 represents straw2 alg datastructure
