@@ -41,3 +41,8 @@ was_replay 定义但未使用
 2. rgw/rgw_rest_swift.cc:8:22: fatal error: ceph_ver.h: No such file or directory
  
  #include "ceph_ver.h"
+
+3. rgw/rgw_swift_auth.cc:144:15: warning: unused variable 'token_tag' [-Wunused-variable]
+   const char *token_tag = "rgwtk";
+   
+   
