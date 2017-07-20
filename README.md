@@ -37,3 +37,7 @@ bug:
 bool was_replay = mdr->client_request && mdr->client_request->is_replay();
 
 was_replay 定义但未使用
+
+2. rgw/rgw_rest_swift.cc:8:22: fatal error: ceph_ver.h: No such file or directory
+ 
+ #include "ceph_ver.h"
