@@ -1,0 +1,26 @@
+宏定义   文件类型
+S_ISREG()   普通文件
+S_ISDIR()   目录文件
+S_ISCHR()   字符设备文件
+S_ISBLK()   块设备文件
+S_ISFIFO()  有名管道文件
+S_ISLNK()   软连接(符号链接)文件
+S_ISSOCK()  套接字文件
+
+geteuid() returns the effective user ID of the calling process.
+
+flock 是对于整个文件的建议性锁。也就是说，如果一个进程在一个文件（inode）上放了锁，那么其它进程是可以知道的。
+（建议性锁不强求进程遵守。）最棒的一点是，它的第一个参数是文件描述符，在此文件描述符关闭时，锁会自动释放。
+而当进程终止时，所有的文件描述符均会被关闭。于是，很多时候就不用考虑解锁的事情啦。
+
+#ifdef WITH_LTTNG
+#define TRACEPOINT_DEFINE
+#define TRACEPOINT_PROBE_DYNAMIC_LINKAGE
+#include "tracing/objectstore.h"
+#undef TRACEPOINT_PROBE_DYNAMIC_LINKAGE
+#undef TRACEPOINT_DEFINE
+#else
+#define tracepoint(...)
+#endif
+
+搞清楚这个tracepoint是什么，能不能做性能打点
