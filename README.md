@@ -29,3 +29,8 @@ cd ceph_10.2.9
 ./configure
 
 make -j5
+
+bug:
+1. mds/MDCache.CC +9130
+bool was_replay = mdr->client_request && mdr->client_request->is_replay();
+was_replay 定义但未使用
