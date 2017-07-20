@@ -2,7 +2,7 @@
 
 ## Imitate ceph's crush algorithm in golang
 
-##ceph build rpm
+# ceph build rpm
 wget -P ~/rpmbuild/SOURCES/ http://download.ceph.com/tarballs/ceph-11.2.0.tar.gz
 
 tar --strip-components=1 -C ~/rpmbuild/SPECS/ --no-anchored -zxvf ~/rpmbuild/SOURCES/ceph-11.2.0.tar.gz "ceph.spec"
@@ -14,7 +14,7 @@ yum install java-devel sharutils checkpolicy selinux-policy-devel /usr/share/sel
 chmown root:root ~/rpmbuild/SPECS/ceph.spec
 rpmbuild -ba ~/rpmbuild/SPECS/ceph.spec
 
-##build ceph from source
+# build ceph from source
 
 wget https://download.ceph.com/tarballs/ceph_10.2.9.orig.tar.gz
 
