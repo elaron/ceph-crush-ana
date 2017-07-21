@@ -31,3 +31,15 @@ logger->tinc(l_os_queue_lat, end - start);
 
 讲解filestore io路径的blog  
 http://blog.wjin.org/posts/ceph-filestore.html
+
+void JournalingObjectStore::_op_journal_transactions(
+  bufferlist& tbl, uint32_t orig_len, uint64_t op,
+  Context *onjournal, TrackedOpRef osd_op)
+  
+  
+  class FileJournal :
+  public Journal,
+  public md_config_obs_t
+   * Implements journaling on top of block device or file.
+ *
+ * Lock ordering is write_lock > aio_lock > (completions_lock | finisher_lock)
