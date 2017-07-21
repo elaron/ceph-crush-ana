@@ -28,3 +28,6 @@ flock 是对于整个文件的建议性锁。也就是说，如果一个进程�
 logger->tinc(l_os_queue_lat, end - start);
 
 这个似乎就是性能打点！
+
+讲解filestore io路径的blog  
+http://blog.wjin.org/posts/ceph-filestore.html
