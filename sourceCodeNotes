@@ -32,10 +32,8 @@ logger->tinc(l_os_queue_lat, end - start);
 讲解filestore io路径的blog  
 http://blog.wjin.org/posts/ceph-filestore.html
 
-void JournalingObjectStore::_op_journal_transactions(
-  bufferlist& tbl, uint32_t orig_len, uint64_t op,
-  Context *onjournal, TrackedOpRef osd_op)
-  
+void JournalingObjectStore::_op_journal_transactions(bufferlist& tbl, uint32_t orig_len, uint64_t op,Context *onjournal, TrackedOpRef osd_op)
+void FileJournal::submit_entry(uint64_t seq, bufferlist& e, uint32_t orig_len, Context *oncommit, TrackedOpRef osd_op)
   
   class FileJournal :
   public Journal,
