@@ -41,3 +41,21 @@ void FileJournal::submit_entry(uint64_t seq, bufferlist& e, uint32_t orig_len, C
    * Implements journaling on top of block device or file.
  *
  * Lock ordering is write_lock > aio_lock > (completions_lock | finisher_lock)
+ 
+ 
+ FileJournal里有一个常出现的结构体，名为bufferlist，其是buffer::list的别名。
+ src/include/buffer_fwd.h
+ 定义了
+ namespace ceph {
+  namespace buffer {
+    class ptr;
+    class list;
+    class hash;
+  }
+
+  using bufferptr = buffer::ptr;
+  using bufferlist = buffer::list;
+  using bufferhash = buffer::hash;
+}
+
+
