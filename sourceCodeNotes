@@ -43,6 +43,7 @@ void FileJournal::submit_entry(uint64_t seq, bufferlist& e, uint32_t orig_len, C
  * Lock ordering is write_lock > aio_lock > (completions_lock | finisher_lock)
  
  
+ http://bean-li.github.io/bufferlist-in-ceph/
  FileJournal里有一个常出现的结构体，名为bufferlist，其是buffer::list的别名。
  src/include/buffer_fwd.h
  定义了
