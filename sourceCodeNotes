@@ -63,6 +63,8 @@ filestore调度过程：
 ｜
 ｜
 int FileStore::queue_transactions(Sequencer *posr, vector<Transaction>& tls, TrackedOpRef osd_op, ThreadPool::TPHandle *handle)
+根据日志类型的不同，会走不同的处理分支
+http://ceph.org.cn/2016/05/02/ceph-osd%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/
 |
 <1> 将list<Transaction> tls倒换到 bufferlist tbl中
 int FileJournal::prepare_entry(vector<ObjectStore::Transaction>& tls, bufferlist* tbl)
