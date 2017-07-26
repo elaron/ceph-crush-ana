@@ -63,16 +63,21 @@ filestore调度过程：
 ｜
 ｜
 int FileStore::queue_transactions(Sequencer *posr, vector<Transaction>& tls, TrackedOpRef osd_op, ThreadPool::TPHandle *handle)
-将list<Transaction> tls倒换到 bufferlist tbl中
-｜
-｜
+|
+<1> 将list<Transaction> tls倒换到 bufferlist tbl中
 int FileJournal::prepare_entry(vector<ObjectStore::Transaction>& tls, bufferlist* tbl)
 1. 遍历tls，将每一个transaction encode到临时变量 bufferlist bl中
 2. 声明临时变量bufferlist ebl,并添加首部信息、添加上一步生成的bl、添加尾部信息（尾部信息与头部信息，why？）
 3. 将上一步的ebl使用CEPH_DIRECTIO_ALIGNMENT进行rebuild，合并多个ptr为一个
 4. 将合并后得到的ptr加入出參 tbl中
 |
-|
+<2> 在journal上执行transaction
+void JournalingObjectStore::_op_journal_transactions(bufferlist& tbl, uint32_t orig_len, uint64_t op, Context *onjournal, TrackedOpRef osd_op)
+若journal指针不为空，且journal可写，则调用
+void FileJournal::submit_entry(uint64_t seq, bufferlist& e, uint32_t orig_len, Context *oncommit, TrackedOpRef osd_op)
+1. 生成新的 complete_item 并插入到 completions 队列中
+2. 生成新的 write_item 并插入到 writeq 队列中
+
 |
 ｜
 
