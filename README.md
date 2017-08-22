@@ -62,6 +62,7 @@ ceph-deploy install --repo-url http://mirrors.163.com/ceph/rpm-jewel/el7 --nogpg
 ceph-deploy --overwrite-conf mon create-initial
 
 vim cleanOsd.sh
+```
 #!/bin/sh
 
 hosts="ceph0 ceph1 ceph2"
@@ -74,9 +75,9 @@ do
                 ceph-deploy disk zap ${hostn}:sd${i}
         done
 done
-
+```
 vim createOsd.sh
-
+```
 #!/bin/sh
 
 hosts="ceph0 ceph1 ceph2"
@@ -89,7 +90,7 @@ do
                 ceph-deploy osd create ${hostn}:sd${i}
         done
 done
-
+```
 
 ceph-deploy admin ceph0 ceph1 ceph2
 
