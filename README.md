@@ -46,3 +46,10 @@ was_replay 定义但未使用
    const char *token_tag = "rgwtk";
    
    
+   
+## install ceph
+ceph-deploy install --repo-url http://mirrors.163.com/ceph/rpm-jewel/el7 --nogpgcheck --gpg-url http://mirrors.163.com/ceph/keys/release.asc ceph0 ceph1 ceph2
+
+ceph-deploy --overwrite-conf mon create-initial
+
+
