@@ -109,9 +109,8 @@ rbd bench-write image01 --pool=fiotest
 ## up firewall port
 
 ```
-ansible ceph -m raw -a "sudo firewall-cmd --zone=public --add-port=6806/tcp --permanent"
-ansible ceph -m raw -a "sudo firewall-cmd --zone=public --add-port=6811/tcp --permanent"
-ansible ceph -m raw -a "sudo firewall-cmd --zone=public --add-port=6810/tcp --permanent"
+ansible ceph -m raw -a "sudo firewall-cmd --add-service=ceph --permanent"
+ansible ceph -m raw -a "sudo firewall-cmd --add-service=ceph-mon --permanent"
 ansible ceph -m raw -a "sudo firewall-cmd --reload"
 ```
 
