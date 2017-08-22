@@ -120,5 +120,7 @@ sudo firewall-cmd --zone=public --add-port=5000/tcp --permanent
 
 sudo firewall-cmd --reload
 
+ceph-rest-api -n client.admin
+
 curl -H "Accept: application/json" 'http://192.168.56.133:5000/api/v0.1/status' | python -mjson.tool
 
