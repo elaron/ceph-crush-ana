@@ -99,3 +99,10 @@ sudo chmod +r /etc/ceph/ceph.client.admin.keyring
 ceph -s
 
 ceph osd pool create fiotest 1024 1024
+
+## ceph write bench
+
+rbd create image01 --size 1024 --pool fiotest
+
+rbd bench-write image01 --pool=fiotest
+
