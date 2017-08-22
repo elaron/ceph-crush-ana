@@ -114,3 +114,11 @@ ansible ceph -m raw -a "sudo firewall-cmd --add-service=ceph-mon --permanent"
 ansible ceph -m raw -a "sudo firewall-cmd --reload"
 ```
 
+## ceph rest api
+
+sudo firewall-cmd --zone=public --add-port=5000/tcp --permanent
+
+sudo firewall-cmd --reload
+
+curl -H "Accept: application/json" 'http://192.168.56.133:5000/api/v0.1/status' | python -mjson.tool
+
