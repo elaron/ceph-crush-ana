@@ -48,6 +48,15 @@ was_replay 定义但未使用
    
    
 ## install ceph
+
+ceph-deploy uninstall ceph0 ceph1 ceph2
+
+ceph-deploy purge ceph0 ceph1 ceph2
+
+ceph-deploy purgedata ceph0 ceph1 ceph2
+
+ceph-deploy forgetkeys
+
 ceph-deploy install --repo-url http://mirrors.163.com/ceph/rpm-jewel/el7 --nogpgcheck --gpg-url http://mirrors.163.com/ceph/keys/release.asc ceph0 ceph1 ceph2
 
 ceph-deploy --overwrite-conf mon create-initial
