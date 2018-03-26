@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"encoding/json"
 )
 
 /*
@@ -24,9 +25,14 @@ type RenameRep struct{
 	TargetName string `json:"target_name"`
 }
 
-type AddRep struct{
+type AddBucketRep struct{
 	Type string `json:"type"`
 	NewItems []string `json:"new_items"`
+}
+
+type AddOsdRep struct{
+	TargetHost string `json:"target_host"`
+	OsdNum int32 `json:"osd_num"`
 }
 
 type MoveRep struct {
@@ -36,11 +42,12 @@ type MoveRep struct {
 }
 
 type ConstructRepresent struct {
-	AddOps []AddRep `json:"add_ops"`
-	MoveOps []MoveRep `json:"move_ops"`
+	AddOps []AddBucketRep `json:"add_ops"`
+	MoveOps []MoveRep     `json:"move_ops"`
 }
 
 type Cluster interface {
+	AddOsds(rep *AddOsdRep) []string
 	AddNode(name string, id int64, nodeType string)(int64, string)
 	MoveNode(nodeId int64, targetNodeId int64) error
 	RenameNode(nodeName string, newName string)
@@ -58,23 +65,23 @@ type Node struct {
 }
 
 type Forest struct{
+	osdId int64
+	bucketId int64
 	Roots []*Node `json:"treeList"`
 }
 
-var (
-	osdId int64 = 0
-	bucketId int64 = -1
-	)
-
-func getNewOsdId() int64 {
-	newId := osdId
-	osdId += 1
+func (forest *Forest) getNewOsdId() int64 {
+	newId := forest.osdId
+	forest.osdId += 1
 	return newId
 }
 
-func getNewBucketId() int64 {
-	newId := bucketId
-	bucketId -= 1
+func (forest *Forest) getNewBucketId() int64 {
+	if forest.bucketId == 0{
+		forest.bucketId = -1
+	}
+	newId := forest.bucketId
+	forest.bucketId -= 1
 	return newId
 }
 
@@ -86,13 +93,29 @@ func (forest *Forest)New(rep *ConstructRepresent){
 		}
 
 	}
-
 	for _, moveRep := range rep.MoveOps {
-		for _, itemName := range moveRep.SourceNames {
-			forest.MoveNode(itemName,moveRep.TargetName)
-			fmt.Println("[New]move node:",itemName,moveRep.TargetName)
-		}
+		forest.MoveOp(&moveRep)
 	}
+
+}
+
+func (forest *Forest) MoveOp(moveRep * MoveRep){
+	for _, itemName := range moveRep.SourceNames {
+		forest.MoveNode(itemName,moveRep.TargetName)
+		fmt.Println("[New]move node:",itemName,moveRep.TargetName)
+	}
+}
+
+func (forest *Forest)AddOsds(rep *AddOsdRep)[]string{
+	var i int32
+	result := make([]string, rep.OsdNum)
+	for i = 0; i < rep.OsdNum; i++ {
+		_, name := forest.AddNode("", "osd")
+		result[i] = name
+	}
+
+	forest.MoveOp(&MoveRep{"host",rep.TargetHost, result})
+	return result
 }
 
 func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
@@ -102,10 +125,10 @@ func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
 	}
 
 	if nodeType == "osd" {
-		node.Id = getNewOsdId()
+		node.Id = forest.getNewOsdId()
 		node.Name = fmt.Sprintf("osd.%d", node.Id)
 	}else{
-		node.Id = getNewBucketId()
+		node.Id = forest.getNewBucketId()
 		node.Children = make(map[int64]*Node)
 	}
 
@@ -173,7 +196,7 @@ func (forest *Forest) MoveNode(nodeName string, targetName string) error  {
  }
 
  targetNode.Children[sourceNode.Id] = sourceNode
- fmt.Println("mv node success", *targetNode)
+ fmt.Println("mv node success", targetNode)
 
  if nil == fatherNode {
 	 var index int
@@ -209,4 +232,13 @@ func (forest *Forest) RenameNode(origName string, newName string)  {
 	}
 
 	node.Name = newName
+}
+
+func (forest *Forest)ToJson() string {
+	b, err := json.Marshal(&forest)
+	if nil != err {
+		fmt.Printf("[ToJson] fail, err=", err)
+		return ""
+	}
+	return string(b)
 }

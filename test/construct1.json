@@ -1,0 +1,216 @@
+{
+    "treeList": [
+        {
+            "children": {
+                "-2": {
+                    "children": {
+                        "0": {
+                            "id": 0,
+                            "name": "osd.0",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "1": {
+                            "id": 1,
+                            "name": "osd.1",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "2": {
+                            "id": 2,
+                            "name": "osd.2",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "3": {
+                            "id": 3,
+                            "name": "osd.3",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "4": {
+                            "id": 4,
+                            "name": "osd.4",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "5": {
+                            "id": 5,
+                            "name": "osd.5",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "6": {
+                            "id": 6,
+                            "name": "osd.6",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "7": {
+                            "id": 7,
+                            "name": "osd.7",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "8": {
+                            "id": 8,
+                            "name": "osd.8",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "9": {
+                            "id": 9,
+                            "name": "osd.9",
+                            "type": "osd",
+                            "weight": 0
+                        }
+                    },
+                    "id": -2,
+                    "name": "host0",
+                    "type": "host",
+                    "weight": 0
+                },
+                "-3": {
+                    "children": {
+                        "10": {
+                            "id": 10,
+                            "name": "osd.10",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "11": {
+                            "id": 11,
+                            "name": "osd.11",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "12": {
+                            "id": 12,
+                            "name": "osd.12",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "13": {
+                            "id": 13,
+                            "name": "osd.13",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "14": {
+                            "id": 14,
+                            "name": "osd.14",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "15": {
+                            "id": 15,
+                            "name": "osd.15",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "16": {
+                            "id": 16,
+                            "name": "osd.16",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "17": {
+                            "id": 17,
+                            "name": "osd.17",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "18": {
+                            "id": 18,
+                            "name": "osd.18",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "19": {
+                            "id": 19,
+                            "name": "osd.19",
+                            "type": "osd",
+                            "weight": 0
+                        }
+                    },
+                    "id": -3,
+                    "name": "host1",
+                    "type": "host",
+                    "weight": 0
+                },
+                "-4": {
+                    "children": {
+                        "20": {
+                            "id": 20,
+                            "name": "osd.20",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "21": {
+                            "id": 21,
+                            "name": "osd.21",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "22": {
+                            "id": 22,
+                            "name": "osd.22",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "23": {
+                            "id": 23,
+                            "name": "osd.23",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "24": {
+                            "id": 24,
+                            "name": "osd.24",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "25": {
+                            "id": 25,
+                            "name": "osd.25",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "26": {
+                            "id": 26,
+                            "name": "osd.26",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "27": {
+                            "id": 27,
+                            "name": "osd.27",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "28": {
+                            "id": 28,
+                            "name": "osd.28",
+                            "type": "osd",
+                            "weight": 0
+                        },
+                        "29": {
+                            "id": 29,
+                            "name": "osd.29",
+                            "type": "osd",
+                            "weight": 0
+                        }
+                    },
+                    "id": -4,
+                    "name": "host2",
+                    "type": "host",
+                    "weight": 0
+                }
+            },
+            "id": -1,
+            "name": "room1",
+            "type": "room",
+            "weight": 0
+        }
+    ]
+}

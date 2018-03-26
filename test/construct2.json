@@ -1,0 +1,114 @@
+{
+    "treeList": [
+        {
+            "children": {
+                "-2": {
+                    "children": {
+                        "-5": {
+                            "children": {
+                                "-7": {
+                                    "children": {
+                                        "0": {
+                                            "id": 0,
+                                            "name": "osd.0",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "1": {
+                                            "id": 1,
+                                            "name": "osd.1",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "2": {
+                                            "id": 2,
+                                            "name": "osd.2",
+                                            "type": "osd",
+                                            "weight": 0
+                                        }
+                                    },
+                                    "id": -7,
+                                    "name": "hostA",
+                                    "type": "host",
+                                    "weight": 0
+                                }
+                            },
+                            "id": -5,
+                            "name": "vrack1",
+                            "type": "rack",
+                            "weight": 0
+                        }
+                    },
+                    "id": -2,
+                    "name": "room1",
+                    "type": "room",
+                    "weight": 0
+                },
+                "-3": {
+                    "children": {
+                        "-6": {
+                            "children": {
+                                "-8": {
+                                    "children": {
+                                        "3": {
+                                            "id": 3,
+                                            "name": "osd.3",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "4": {
+                                            "id": 4,
+                                            "name": "osd.4",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "5": {
+                                            "id": 5,
+                                            "name": "osd.5",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "6": {
+                                            "id": 6,
+                                            "name": "osd.6",
+                                            "type": "osd",
+                                            "weight": 0
+                                        },
+                                        "7": {
+                                            "id": 7,
+                                            "name": "osd.7",
+                                            "type": "osd",
+                                            "weight": 0
+                                        }
+                                    },
+                                    "id": -8,
+                                    "name": "hostB",
+                                    "type": "host",
+                                    "weight": 0
+                                }
+                            },
+                            "id": -6,
+                            "name": "vrack2",
+                            "type": "rack",
+                            "weight": 0
+                        }
+                    },
+                    "id": -3,
+                    "name": "room2",
+                    "type": "room",
+                    "weight": 0
+                },
+                "-4": {
+                    "id": -4,
+                    "name": "room3",
+                    "type": "room",
+                    "weight": 0
+                }
+            },
+            "id": -1,
+            "name": "EBS_SHB",
+            "type": "root",
+            "weight": 0
+        }
+    ]
+}
