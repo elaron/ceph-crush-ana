@@ -8,16 +8,16 @@ import (
 
 func Test_Construct(t *testing.T)  {
 	var forest Forest
-	rootId, _:= forest.AddNode("room1", "room")
+	_, rootName:= forest.AddNode("room1", "room")
 	for i:=0; i < 3; i++ {
-		bucketId, _ := forest.AddNode(fmt.Sprintf("host%d",i), "host")
-		err := forest.MoveNode(bucketId,rootId)
+		_, bucketName := forest.AddNode(fmt.Sprintf("host%d",i), "host")
+		err := forest.MoveNode(bucketName,rootName)
 		if nil != err {
 			t.Error(err)
 		}
 		for j := 0; j < 10; j++ {
-			osdId,_ := forest.AddNode(fmt.Sprintf("osd.%s", i*j), "osd")
-			err := forest.MoveNode(osdId, bucketId)
+			_,osdName := forest.AddNode(fmt.Sprintf("osd.%s", i*j), "osd")
+			err := forest.MoveNode(osdName, bucketName)
 			if nil != err {
 				t.Error(err)
 			}

@@ -6,10 +6,45 @@ import (
 	"sync"
 )
 
+/*
+[rename]
+default:EBS_SZAZ1
+[add]
+room:XL_IDC6 XL_IDC7
+rack:vrack1 vrack2
+[move]
+root=EBS_SZAZ1: XL_IDC6 XL_IDC7
+room=XL_IDC6: vrack1 vrack2
+room:=XL_IDC7: vrack3
+rack=vrack1: HOSTNAME1 HOSTNAME2
+*/
+
+type RenameRep struct{
+	OrigName string `json:"orig_name"`
+	TargetName string `json:"target_name"`
+}
+
+type AddRep struct{
+	Type string `json:"type"`
+	NewItems []string `json:"new_items"`
+}
+
+type MoveRep struct {
+	TargetType string `json:"target_type"`
+	TargetName string `json:"target_name"`
+	SourceNames []string `json:"source_names"`
+}
+
+type ConstructRepresent struct {
+	AddOps []AddRep `json:"add_ops"`
+	MoveOps []MoveRep `json:"move_ops"`
+}
+
 type Cluster interface {
 	AddNode(name string, id int64, nodeType string)(int64, string)
 	MoveNode(nodeId int64, targetNodeId int64) error
 	RenameNode(nodeName string, newName string)
+	New(rep *ConstructRepresent)
 }
 
 type Node struct {
@@ -43,6 +78,23 @@ func getNewBucketId() int64 {
 	return newId
 }
 
+func (forest *Forest)New(rep *ConstructRepresent){
+	for _, addRep := range rep.AddOps {
+		for _, itemName := range addRep.NewItems {
+			id, name := forest.AddNode(itemName, addRep.Type)
+			fmt.Println("[New]add node:",id,name)
+		}
+
+	}
+
+	for _, moveRep := range rep.MoveOps {
+		for _, itemName := range moveRep.SourceNames {
+			forest.MoveNode(itemName,moveRep.TargetName)
+			fmt.Println("[New]move node:",itemName,moveRep.TargetName)
+		}
+	}
+}
+
 func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
 	node := &Node{
 		Name: name,
@@ -61,13 +113,13 @@ func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
 	return node.Id, node.Name
 }
 
-func searchFatherNode(node, fatherNode *Node, nodeId int64) (*Node, *Node, bool) {
-	if node.Id == nodeId {
+func searchFatherNode(node, fatherNode *Node, nodeName string) (*Node, *Node, bool) {
+	if node.Name == nodeName {
 		return fatherNode, node, true
 	}
 
 	for _, childNode := range node.Children {
-		father, me, findFather := searchFatherNode(childNode, node, nodeId)
+		father, me, findFather := searchFatherNode(childNode, node, nodeName)
 		if true == findFather {
 			return father, me, true
 		}
@@ -75,13 +127,13 @@ func searchFatherNode(node, fatherNode *Node, nodeId int64) (*Node, *Node, bool)
 	return nil, node, false
 }
 
-func searchNode(node *Node, targetId int64) (*Node, bool) {
-	if node.Id == targetId {
+func searchNode(node *Node, targetName string) (*Node, bool) {
+	if node.Name == targetName {
 		return node, true
 	}
 
 	for _, childNode := range node.Children {
-		find, _ := searchNode(childNode, targetId)
+		find, _ := searchNode(childNode, targetName)
 		if nil != find {
 			return find, true
 		}
@@ -89,7 +141,7 @@ func searchNode(node *Node, targetId int64) (*Node, bool) {
 	return nil,false
 }
 
-func (forest *Forest) MoveNode(nodeId int64, targetNodeId int64) error  {
+func (forest *Forest) MoveNode(nodeName string, targetName string) error  {
 	var findFather, findTarget bool
  var fatherNode, sourceNode,  targetNode *Node
  for _, root := range forest.Roots {
@@ -98,35 +150,35 @@ func (forest *Forest) MoveNode(nodeId int64, targetNodeId int64) error  {
 	}
 
  	if false == findFather {
-		fatherNode, sourceNode, findFather = searchFatherNode(root, nil, nodeId)
+		fatherNode, sourceNode, findFather = searchFatherNode(root, nil, nodeName)
 	}
 
 	if false == findTarget {
-		targetNode, findTarget = searchNode(root,targetNodeId)
+		targetNode, findTarget = searchNode(root,targetName)
 	}
  }
 
  if false == findTarget {
- 	msg := fmt.Sprintf("Can't find targetNode(id=%d).", targetNodeId)
+ 	msg := fmt.Sprintf("Can't find targetNode(name=%s).", targetName)
  	return errors.New(msg)
  }
 	if false == findFather {
-		msg := fmt.Sprintf("Can't find fatherNode of node(id=%d).", nodeId)
+		msg := fmt.Sprintf("Can't find fatherNode of node(id=%d).", nodeName)
 		return errors.New(msg)
 	}
 
  if nil == sourceNode {
-	 msg := fmt.Sprintf("Can't find Node(id=%d).", nodeId)
+	 msg := fmt.Sprintf("Can't find Node(id=%d).", nodeName)
 	 return errors.New(msg)
  }
 
- targetNode.Children[nodeId] = sourceNode
+ targetNode.Children[sourceNode.Id] = sourceNode
  fmt.Println("mv node success", *targetNode)
 
  if nil == fatherNode {
 	 var index int
 	 for i, root := range forest.Roots {
-		 if root.Id == nodeId {
+		 if root.Name == nodeName {
 			 index = i
 			 break
 		 }
@@ -136,23 +188,23 @@ func (forest *Forest) MoveNode(nodeId int64, targetNodeId int64) error  {
  }
 
 	fatherNode.c_lock.Lock()
-	delete(fatherNode.Children, nodeId)
+	delete(fatherNode.Children, sourceNode.Id)
 	fatherNode.c_lock.Unlock()
 	return nil
 }
 
-func (forest *Forest) RenameNode(nodeId int64, newName string)  {
+func (forest *Forest) RenameNode(origName string, newName string)  {
 	var node *Node
 	for _, root := range forest.Roots {
 		if node == nil {
-			node, _ = searchNode(root,nodeId)
+			node, _ = searchNode(root,origName)
 		}else{
 			break
 		}
 	}
 
 	if nil == node {
-		fmt.Println("Can't find node id=", nodeId)
+		fmt.Println("Can't find node id=", origName)
 		return
 	}
 
