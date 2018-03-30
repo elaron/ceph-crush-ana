@@ -47,36 +47,37 @@ type ConstructRepresent struct {
 }
 
 type Cluster interface {
-	AddOsds(rep *AddOsdRep) []string
-	AddNode(name string, id int64, nodeType string)(int64, string)
-	MoveNode(nodeId int64, targetNodeId int64) error
-	RenameNode(nodeName string, newName string)
+	AddOsds(rep *AddOsdRep)[]string
+	AddNode(name, nodeType string) (int, string)
+	MoveNode(nodeName string, targetName string) error
+	RenameNode(origName string, newName string)
 	New(rep *ConstructRepresent)
+	GetRoots() []*Node
 }
 
 type Node struct {
 	Name string `json:"name"`
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 	Type string `json:"type"`
 	Status string `json:"status,omitempty"`
 	Weight float64 `json:"weight"`
-	Children map[int64]*Node `json:"children,omitempty"`
+	Children map[int]*Node `json:"children,omitempty"`
 	c_lock sync.RWMutex
 }
 
 type Forest struct{
-	osdId int64
-	bucketId int64
+	osdId int
+	bucketId int
 	Roots []*Node `json:"treeList"`
 }
 
-func (forest *Forest) getNewOsdId() int64 {
+func (forest *Forest) getNewOsdId() int {
 	newId := forest.osdId
 	forest.osdId += 1
 	return newId
 }
 
-func (forest *Forest) getNewBucketId() int64 {
+func (forest *Forest) getNewBucketId() int {
 	if forest.bucketId == 0{
 		forest.bucketId = -1
 	}
@@ -85,7 +86,7 @@ func (forest *Forest) getNewBucketId() int64 {
 	return newId
 }
 
-func (forest *Forest)New(rep *ConstructRepresent){
+func (forest *Forest) New(rep *ConstructRepresent){
 	for _, addRep := range rep.AddOps {
 		for _, itemName := range addRep.NewItems {
 			id, name := forest.AddNode(itemName, addRep.Type)
@@ -106,7 +107,7 @@ func (forest *Forest) MoveOp(moveRep * MoveRep){
 	}
 }
 
-func (forest *Forest)AddOsds(rep *AddOsdRep)[]string{
+func (forest *Forest) AddOsds(rep *AddOsdRep)[]string{
 	var i int32
 	result := make([]string, rep.OsdNum)
 	for i = 0; i < rep.OsdNum; i++ {
@@ -118,7 +119,7 @@ func (forest *Forest)AddOsds(rep *AddOsdRep)[]string{
 	return result
 }
 
-func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
+func (forest *Forest) AddNode(name, nodeType string) (int, string) {
 	node := &Node{
 		Name: name,
 		Type: nodeType,
@@ -129,7 +130,7 @@ func (forest *Forest) AddNode(name, nodeType string) (int64, string) {
 		node.Name = fmt.Sprintf("osd.%d", node.Id)
 	}else{
 		node.Id = forest.getNewBucketId()
-		node.Children = make(map[int64]*Node)
+		node.Children = make(map[int]*Node)
 	}
 
 	forest.Roots = append(forest.Roots, node)
@@ -241,4 +242,8 @@ func (forest *Forest)ToJson() string {
 		return ""
 	}
 	return string(b)
+}
+
+func (forest *Forest) GetRoots() []*Node {
+	return forest.Roots
 }

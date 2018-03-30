@@ -9,10 +9,12 @@ import (
 
 func Test_Construct(t *testing.T)  {
 	var forest Forest
-	_, rootName:= forest.AddNode("room1", "room")
+	_, rootName:= forest.AddNode("root", "root")
+	_, roomName:= forest.AddNode("room1", "room")
+	forest.MoveNode(roomName,rootName)
 	for i:=0; i < 3; i++ {
 		_, bucketName := forest.AddNode(fmt.Sprintf("host%d",i), "host")
-		err := forest.MoveNode(bucketName,rootName)
+		err := forest.MoveNode(bucketName,roomName)
 		if nil != err {
 			t.Error(err)
 		}
