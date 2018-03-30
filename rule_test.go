@@ -21,14 +21,18 @@ func Test_DoRule_1(t *testing.T)  {
 	}
 
 	var simpleRule SimpleRule
-	simpleRule.Init(RuleRepresent{
+	rep := RuleRepresent{
 		[]SelectStep{
 			SelectStep{Type:"root", Num:1},
 			SelectStep{Type:"room", Num:1},
 			SelectStep{Type:"host", Num:3},
 			SelectStep{Type:"osd", Num:1},
 		},
-	})
+	}
+	simpleRule.Init(rep)
+
+	b, _ := json.Marshal(&rep)
+	t.Log(string(b))
 
 	selected := simpleRule.DoRule(&forest)
 	if len(selected) != 3 {

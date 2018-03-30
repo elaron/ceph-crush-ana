@@ -1,126 +1,119 @@
-# ceph-crush-ana
+# Description
+This is a project that implement the CRUSH algorithm.
+It's mainly doing two things:
 
-## Imitate ceph's crush algorithm in golang
+1. Construct a physical cluster into logical *tree* structure
+2. Selecting specific number of items follows the *rule*
 
-# ceph build rpm
-wget -P ~/rpmbuild/SOURCES/ http://download.ceph.com/tarballs/ceph-11.2.0.tar.gz
+# How to construct your cluster
+ceph-crush-ana accept a json of tree representation to help itself construct the cluster.
+There are two types of item in structer.
+Bucket and osd.
 
-tar --strip-components=1 -C ~/rpmbuild/SPECS/ --no-anchored -zxvf ~/rpmbuild/SOURCES/ceph-11.2.0.tar.gz "ceph.spec"
-
-yum install rpm-build rpmdevtools -y
-
-yum install java-devel sharutils checkpolicy selinux-policy-devel /usr/share/selinux/devel/policyhelp   boost-devel boost-python cmake cryptsetup fuse-devel gcc-c++ gperftools-devel jq leveldb-devel libaio-devel libatomic_ops-devel libblkid-devel libcurl-devel libudev-devel libtool libxml2-devel python-devel python-nose python-requests python-sphinx python-virtualenv snappy-devel valgrind-devel xfsprogs-devel xmlstarlet yasm boost-random nss-devel keyutils-libs-devel openldap-devel openssl-devel redhat-lsb-core Cython python34-devel python34-setuptools python34-Cython lttng-ust-devel -y
-
-chmown root:root ~/rpmbuild/SPECS/ceph.spec
-rpmbuild -ba ~/rpmbuild/SPECS/ceph.spec
-
-# build ceph from source
-
-wget https://download.ceph.com/tarballs/ceph_10.2.9.orig.tar.gz
-
-tar -xvf ceph_10.2.9.orig.tar.gz
-
-yum install java-devel sharutils checkpolicy selinux-policy-devel /usr/share/selinux/devel/policyhelp   boost-devel boost-python cmake cryptsetup fuse-devel gcc-c++ gperftools-devel jq leveldb-devel libaio-devel libatomic_ops-devel libblkid-devel libcurl-devel libudev-devel libtool libxml2-devel python-devel python-nose python-requests python-sphinx python-virtualenv snappy-devel valgrind-devel xfsprogs-devel xmlstarlet yasm boost-random nss-devel keyutils-libs-devel openldap-devel openssl-devel redhat-lsb-core Cython python34-devel python34-setuptools python34-Cython lttng-ust-devel -y
-
-cd ceph_10.2.9
-
-./autogen.sh
-
-./configure
-
-make -j5
-
-bug:
-
-1. mds/MDCache.CC +9130
-
-bool was_replay = mdr->client_request && mdr->client_request->is_replay();
-
-was_replay 定义但未使用
-
-2. rgw/rgw_rest_swift.cc:8:22: fatal error: ceph_ver.h: No such file or directory
- 
- #include "ceph_ver.h"
-
-3. rgw/rgw_swift_auth.cc:144:15: warning: unused variable 'token_tag' [-Wunused-variable]
-   const char *token_tag = "rgwtk";
-   
-   
-   
-## install ceph
-
-ceph-deploy uninstall ceph0 ceph1 ceph2
-
-ceph-deploy purge ceph0 ceph1 ceph2
-
-ceph-deploy purgedata ceph0 ceph1 ceph2
-
-ceph-deploy forgetkeys
-
-ceph-deploy install --repo-url http://mirrors.163.com/ceph/rpm-jewel/el7 --nogpgcheck --gpg-url http://mirrors.163.com/ceph/keys/release.asc ceph0 ceph1 ceph2
-
-ceph-deploy --overwrite-conf mon create-initial
-
-vim cleanOsd.sh
+For bucket type, you can represent its structure ,like:
 ```
-#!/bin/sh
-
-hosts="ceph0 ceph1 ceph2"
-dev="b c"
-
-for hostn in $hosts
-do
-        for i in $dev
-        do
-                ceph-deploy disk zap ${hostn}:sd${i}
-        done
-done
-```
-vim createOsd.sh
-```
-#!/bin/sh
-
-hosts="ceph0 ceph1 ceph2"
-dev="b c"
-
-for hostn in $hosts
-do
-        for i in $dev
-        do
-                ceph-deploy osd create ${hostn}:sd${i}
-        done
-done
+{
+    "add_ops": [
+        {
+            "new_items": ["IDC-01"],
+            "type": "root"
+        },
+        {
+            "new_items": ["room1", "room2", "room3"],
+            "type": "room"
+        },
+        {
+            "new_items": ["vrack1", "vrack2"],
+            "type": "rack"
+        },
+        {
+            "new_items": ["hostA", "hostB"],
+            "type": "host"
+        }
+    ],
+    "move_ops": [
+        {
+            "source_names": ["room1", "room2", "room3"],
+            "target_name": "EBS_SHB",
+            "target_type": "root"
+        },
+        {
+            "source_names": ["vrack1"],
+            "target_name": "room1",
+            "target_type": "room"
+        },
+        {
+            "source_names": ["vrack2"],
+            "target_name": "room2",
+            "target_type": "room"
+        },
+        {
+            "source_names": ["hostA"],
+            "target_name": "vrack1",
+            "target_type": "rack"
+        },
+        {
+            "source_names": ["hostB"],
+            "target_name": "vrack2",
+            "target_type": "rack"
+        }
+    ]
+}
 ```
 
-ceph-deploy admin ceph0 ceph1 ceph2
+After that, you will get a tree like:
 
-sudo chmod +r /etc/ceph/ceph.client.admin.keyring
+IDC-01 && (root)<br>
+&&|-room1 && (room)<br>
+&&&& |-vrack1 && (rack) <br>
+&&&&&&&& |-hostA && (host) <br>
+&&|-room2 && (room)<br>
+&&&& |-vrack2 && (rack) <br>
+&&&&&&&& |-hostB && (host) <br>
+&&|-room3 && (room) <br>
+             
 
-ceph -s
-
-ceph osd pool create fiotest 1024 1024
-
-## ceph write bench
-
-rbd create image01 --size 1024 --pool fiotest
-
-rbd bench-write image01 --pool=fiotest
-
-## up firewall port
-
+For osds, you must represent them under a certain *Host*, like:
 ```
-ansible ceph -m raw -a "sudo firewall-cmd --add-service=ceph --permanent"
-ansible ceph -m raw -a "sudo firewall-cmd --add-service=ceph-mon --permanent"
-ansible ceph -m raw -a "sudo firewall-cmd --reload"
+{
+    "osd_num": 3,
+    "target_host": "hostA"
+}
 ```
+After that, hostA will contain 3 osds, and the tree will become:
 
-## ceph rest api
+IDC-01 && (root)<br>
+&&|-room1 && (room)<br>
+&&&& |-vrack1 && (rack) <br>
+&&&&&&&& |-hostA && (host) <br>
+& & & & & & & & |-osd.0 && (osd) <br>
+& & & & & & & & |-osd.1 && (osd) <br>
+& & & & & & & & |-osd.2 && (osd) <br>
+&&|-room2 && (room)<br>
+&&&& |-vrack2 && (rack) <br>
+&&&&&&&& |-hostB && (host) <br>
+&&|-room3 && (room) <br>
 
-sudo firewall-cmd --zone=public --add-port=5000/tcp --permanent
+The osd name will create by ceph-crush-ana.
 
-sudo firewall-cmd --reload
+# How to represent your Rule
 
-ceph-rest-api -n client.admin
+A rule will contain several steps, which finally lead to couples of items you want.
 
-curl -H "Accept: application/json" 'http://192.168.56.133:5000/api/v0.1/status' | python -mjson.tool
+For example:
+```
+{
+    "steps": [
+        {"num": 1, "type": "root"},
+        {"num": 1, "type": "room"},
+        {"num": 3,"type": "host"},
+        {"num": 1,"type": "osd"}
+    ]
+}
+```
+Then ceph-crush-ana will do following things:
+step1: choose the root <br>
+step2: select 1 room from root <br>
+step3: select 3 hosts from each room of step2 <br>
+step4: select 1 osd from each host of step3 <br>
 
